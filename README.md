@@ -88,7 +88,34 @@ Note: the instance will quickly start (within 1-10 seconds), however, when the i
 
 #### Connection to the running instance
 
-Once the instance is running
+Once the instance is running it is possible to connect to it with SSH. In the terminal type the following command:
+
+```bash
+ssh -i /path/key-pair-name.pem instance-user-name@instance-public-dns-name
+```
+
+In our case :
+
+```bash
+ssh -i GrU_VanHove.pem ubuntu@ec2-54-235-226-53.compute-1.amazonaws.com
+```
+
+Then, the following prompt will be displayed:
+```
+The authenticity of host 'ec2-54-235-226-53.compute-1.amazonaws.com (198-51-100-1)' can't be established.
+ECDSA key fingerprint is l4UB/neBad9tvkgJf1QZWxheQmR59WgrgzEimCG6kZY.
+Are you sure you want to continue connecting (yes/no)?
+```
+
+Just type "yes", then the connection will be established. This message warns you that the authenticity of the host is not verified. If you really want to be sure not to be the target of a MITM attack, you can compare the displayed key fingerprint with the help of this [documentation.](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html#connection-prereqs-fingerprint)
+
+##### Troublshooting
+
+In case of error, you can read this [troubleshooting guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html).
+
+#### Questions
+
+
 
 ## Part 3 : Install a web application
 
