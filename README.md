@@ -115,6 +115,30 @@ In case of error, you can read this [troubleshooting guide](https://docs.aws.ama
 
 #### Questions
 
+**1 What is the smallest and the biggest instance type (in terms of virtual CPUs and memory) that you can choose from when creating an instance?**
+
+There are 624 different type of instances. From all of those we found the u-24tb1.112xlarge that allows 448 virtual CPUs with 24576 GB or memory and a 100 Gigabit speed network capabilities. The pricing is 218.4$ per hour.
+
+**2 How long did it take for the new instance to get into the *running* state?**
+
+Approximatively 10 seconds. However, we must wait approx. 3-5 minutes for the check tests to be passed.
+
+**3 From the EC2 Management Console copy the public DNS name of the instance into the report.**
+
+ec2-3-83-165-119.compute-1.amazonaws.com
+
+**4 What's the difference between time here in Switzerland and the time set on the machine?**
+
+The time on the machine is set to UTC but here we are using UTC + 1 so  the instance time is 1 hour early.
+
+**5 What's the name of the hypervisor?**
+
+I our case Xen. We found it with the command lscpu that displays information about the CPU architecture.
+
+Otherwise, Amazon Nitro System for the newest EC2 infrastructure.[Source](https://aws.amazon.com/fr/ec2/nitro/)
+
+**6 How much free space does the disk have?**
+
 
 
 ## Part 3 : Install a web application
