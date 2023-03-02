@@ -14,6 +14,27 @@ In this part, we are going to configure and launch a virtual ubuntu server with 
 
 #### Step 1 : Creating key pairs
 
+To later connect to our instance with SSH, we need to generate a key pair for the authentication. Here's how to proceed:
+
+1. From the left menu on the EC2 dashboard, go to to "Network & Security" -> "Key Pairs".
+2. Click on "Create key pair" on the top right corner.
+3. Select RSA or ED25519 encryption
+   1. Note that ED25519 work only with mac or linux **instances**
+4. Depending of the SSH client on your local machine:
+   1. With OpenSSH select .pem file
+   2. With PuTTY .ppk file
+5. Click on "Create key pair"
+
+![Menu to create a key pair](img\keyPair.png)
+
+The private key file will automatically be downloaded in you browser.
+
+If you are using a linux/mac OS on your local machine, yo will need do change the access rights of the key file:
+
+```bash
+chmod 400 yourFileName.pem
+```
+
 #### Step 2 : Setting up the security groups
 
 #### Step 3 : Create and launch an Amazon EC2 instance
