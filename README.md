@@ -1,5 +1,35 @@
 # HEIG_CLD_Labo1
 
+**Group U : A. David, T.Van Hove**
+
+## Introduction
+
+This document describes the successive steps necessary to successfully complete laboratory #1 of the CLD course. It will also allow our group to answer the various questions asked in the lab instructions.
+
+The objectives of this lab is to gain experience with an Infrastructure-as-a-Service. We are going to use  AWS to create a service from scratch and measure its performance and resource consumption. Finally we will estimate the price tag of such a service using AWS.
+
+## Part 1 & 2 : Setting up a virtual server
+
+In this part, we are going to configure and launch a virtual ubuntu server with Amazon Elastic Compute Cloud (Amazon EC2). 
+
+#### Step 1 : Creating key pairs
+
+#### Step 2 : Setting up the security groups
+
+#### Step 3 : Create and launch an Amazon EC2 instance
+
+
+
+## Part 3 : Install a web application
+
+## Part 4 : Create volumes and use snapshots
+
+## Part 5 Performance analysis
+
+## Part 6 : Resource consumption and pricing
+
+## Conclusion
+
 
 
 task2 commands on the remote machine:
