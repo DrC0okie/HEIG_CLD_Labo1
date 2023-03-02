@@ -12,7 +12,7 @@ The objectives of this lab is to gain experience with an Infrastructure-as-a-Ser
 
 In this part, we are going to configure and launch a virtual ubuntu server with Amazon Elastic Compute Cloud (Amazon EC2). 
 
-#### Step 1 : Creating key pairs
+#### Creating key pairs
 
 To later connect to our instance with SSH, we need to generate a key pair for the authentication. Here's how to proceed:
 
@@ -35,11 +35,48 @@ If you are using a linux/mac OS on your local machine, yo will need do change th
 chmod 400 yourFileName.pem
 ```
 
-#### Step 2 : Setting up the security groups
+#### Setting up the security groups
 
-#### Step 3 : Create and launch an Amazon EC2 instance
+We will set the security group to allow any incoming SSH connection.
 
+1. From the left menu on the EC2 dashboard, go to to "Network & Security" -> "Security groups".
+2. Click on "Create security group" on the top right corner.
+3. Type a name and eventually a description for the security group.
+4. Add an inbound rule by clicking on the "Add rule" button.
+5. Select "SSH" from the "Type" drop down menu.
+6. Select "Anywhere-IPv4" from the "Source type" drop down menu.
+7. Add an optionnal description
+8. Click on the "Add rule" button.
+9. Click on "Create security group" button on the bottom right of the page.
 
+![Create a security group](img\CreateSecurityGroup.png)
+
+Now we have the 2 mandatory components to create and access our future instance.
+
+#### Create and launch an Amazon EC2 instance
+
+Now we will create our instance.
+
+1. From the left menu on the EC2 dashboard, go to to "Instances" -> "Instances".
+
+2. Click on "Launch instances" on the top right corner.
+
+3. Give a name to your instance
+
+4. Select the OS image you want to use (In this context we'll be using ubuntu).
+
+5. Select the version of the specific image you want in the drop down menu (ubuntu Server LTS 18.04 SSD Volume type)
+
+6. Select the CPU architecture of you OS from the drop down menu
+
+7. You can choose the instance type from the drop down menu. The instance type defines the performance level of the virtualized instance with more or less CPU threads, memory and network performance. In this context we are using the t2.micro instance type :
+   |   Type   | vCPU | Architecture | Memory | Network perf |
+   | :------: | :--: | :----------: | :----: | :----------: |
+   | t2.micro |  1   |    x86_64    |  1 GB  | Low/Moderate |
+
+8. In the Key pair section, select the Key pair you configured [previously](#Creating-key-pairs) from the drop down list.
+
+9. In the Network settings section, select the existing security group you configured [previously](#Setting-up-the-security-groups) from the drop down list
 
 ## Part 3 : Install a web application
 
