@@ -25,7 +25,7 @@ To later connect to our instance with SSH, we need to generate a key pair for th
    2. With PuTTY .ppk file
 5. Click on "Create key pair"
 
-![Menu to create a key pair](img\keyPair.png)
+![Menu to create a key pair](img/keyPair.png)
 
 The private key file will automatically be downloaded in you browser.
 
@@ -49,7 +49,7 @@ We will set the security group to allow any incoming SSH connection.
 8. Click on the "Add rule" button.
 9. Click on "Create security group" button on the bottom right of the page.
 
-![Create a security group](img\CreateSecurityGroup.png)
+![Create a security group](img/CreateSecurityGroup.png)
 
 Now we have the 2 mandatory components to create and access our future instance.
 
@@ -69,7 +69,7 @@ Now we will create our instance.
 
 6. Select the CPU architecture of you OS from the drop down menu
 
-7. You can choose the instance type from the drop down menu. The instance type defines the performance level of the virtualized instance with more or less CPU threads, memory and network performance. In this context we are using the t2.micro instance type :
+7. You can choose the instance type from the drop down menu. It will define the performance level of the virtualized instance with more or less CPU threads, memory and network performance. In this context we are using the t2.micro instance type :
    |   Type   | vCPU | Architecture | Memory | Network perf |
    | :------: | :--: | :----------: | :----: | :----------: |
    | t2.micro |  1   |    x86_64    |  1 GB  | Low/Moderate |
@@ -77,6 +77,18 @@ Now we will create our instance.
 8. In the Key pair section, select the Key pair you configured [previously](#Creating-key-pairs) from the drop down list.
 
 9. In the Network settings section, select the existing security group you configured [previously](#Setting-up-the-security-groups) from the drop down list
+
+10. You can configure the number of volumes, the amount and type of storage memory you want to use in the "Configure storage" section. We have chosen 8GB genera purpose SSD (gp2) that was selected by default.
+
+11. It is possible to configure advanced parameters such as shutdown behavior, or credit specification. We left this section configures by default.
+
+12. Finally, click on the "Launch instance" button at the bottom of the page
+
+Note: the instance will quickly start (within 1-10 seconds), however, when the instance has started for the first time, some status check will be performed. During those check, it is possible to be unable to connect to your instance with SSH. In this case, just wait until the status checks are passed.
+
+#### Connection to the running instance
+
+Once the instance is running
 
 ## Part 3 : Install a web application
 
