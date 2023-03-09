@@ -320,7 +320,7 @@ sudo chown -R www-data:www-data drupal/
 
 The set up is done directly in the browser. Now, navigate to the hostname of the EC2 instance with the appended path `/drupal/core/install.php`.
 
-Fill in the installation screens as follows:
+We filled in the installation screens as follows:
 
 - Choose language: **English**
 - Select an installation profile: **Standard**
@@ -385,6 +385,93 @@ The public DNS name of an instance is associated with its IP address, which can 
 Furthermore, when using the public DNS name, we have no control over the DNS record. This means that we cannot configure SSL certificates, subdomains or other DNS features, which may be necessary for our web site.
 
 ## Part 4 : Create volumes and use snapshots
+
+In this part we are going to assume that our Drupal site has run out of disk space. To mitigate the problem, we are going to create an additional virtual disk and attach it to the virtual machine.
+
+In the EC2 dashboard, in our instance summary, on the `Storage tab` we can see that our root device is `/dev/sda1` and it's a EBS (Ephemeral Based Storage).
+
+![](img/EBS.png)
+
+By clicking on the volume, we can see it's details, in particular it's availability zone: `us-east-1b`.
+
+If we check within our instance with SSH (with `df -h /`), we can see the following:
+
+```bash
+$ df -h /
+
+# Our OS sees 7.6GB volume
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1      7.6G  2.5G  5.2G  33% /
+```
+
+### Create and assign an additional volume
+
+1. On the EC2 dashboard, navigate to `Elastic Block Store` -> `Volumes`, then click on the `Create volume` button.
+2. Allocate the desired volume size (we selected 1GB).
+
+3. Select the availability zone. It must be the same as your EC2 instance. We chose us-east-1a.
+
+4. Eventually, add a tag `Name` with, for value, the name you want to give it.
+
+5. Click on the `Create volume` button.
+6. Once it's created, Select it in the volume list, and attach it to your instance.
+
+Once it's done, we can navigate to the `/dev` directory using SSH to display the file that represent the disk:
+
+```bash
+/dev$ ls -l /dev/xvdf
+brw-rw---- 1 root disk 202, 80 Mar  9 15:27 /dev/xvdf
+```
+
+Now we are going to partition the newly created disk with ext4:
+```bash
+sudo mkfs --type ext4 /dev/xvdf
+```
+
+The we must mount it:
+
+```bash
+sudo mkdir /mnt/disk
+sudo mount /dev/xvdf /mnt/disk
+```
+
+We can observe what's on the new disk:
+```bash
+ls -la /mnt/disk
+total 24
+drwxr-xr-x 3 root root  4096 Mar  9 16:01 .
+drwxr-xr-x 3 root root  4096 Mar  9 16:02 ..
+drwx------ 2 root root 16384 Mar  9 16:01 lost+found
+```
+
+We can see the capacity of the new disk:
+
+```bash
+df -h /mnt/disk
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvdf       974M   24K  907M   1% /mnt/disk
+```
+
+We can write some data on it :
+
+```bash
+sudo bash -c 'date >> /mnt/disk/file'
+cat /mnt/disk/file
+
+# We can see the data we wrote on the disk, but it may be read from its cache
+Thu Mar  9 16:05:02 UTC 2023
+
+# With sync we are sure that the data is really read from the disk
+ubuntu@ip-172-31-82-15:/dev$ sync
+ubuntu@ip-172-31-82-15:/dev$ cat /mnt/disk/file
+Thu Mar  9 16:05:02 UTC 2023
+```
+
+### Make a snapshot of our volume
+
+
+
+
 
 ## Part 5 : Performance analysis
 
