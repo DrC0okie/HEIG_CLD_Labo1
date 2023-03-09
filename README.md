@@ -469,6 +469,91 @@ Thu Mar  9 16:05:02 UTC 2023
 
 ### Make a snapshot of our volume
 
+From the EC2 bashboard we navigate to `Elastic Block Store` -> `Volumes` and select the volume we created. Then, from the `Action` drop down button, select `Create snapshot`. We give our snapshot a name and click on the `Create snapshot` button. Now we can see the newly created snapshot on `Elastic Block Store` -> `Snapshots`.  We must wait until it has the `completed` status.
+
+Now we will write more data to the disk to validate that our snapshot represent an older version of our disk:
+
+```bash
+sudo bash -c 'date >> /mnt/disk/file'
+cat /mnt/disk/file
+```
+
+Now we will restore our disk with the snapshot.
+
+We will create a new volume like [we did previously](#Create-and-assign-an-additional-volume), but instead of a new volume, we will select `create a volume from a snapshot` and select the snapshot we previously created.
+
+![](img/snapshot_creation.png)
+
+Attach the volume to your instance.
+
+Now in our instance, we can see that we have a new `sdg` volume:
+
+![](img/new_volume_snapshot.png)
+
+We can also see the third volume in the instance, under the `Storage` tab:
+
+![](img/3volumes.png)
+
+Now we can mount our snapshot volume:
+
+```bash
+sudo mkdir /mnt/disk2
+sudo mount /dev/xvdg /mnt/disk2
+```
+
+And we can verify that the data has indeed been saved in the snapshot:
+
+```bash
+cat /mnt/disk2/file
+
+# We can see that we have the data we put on the disk before the snapshot
+Thu Mar  9 16:05:02 UTC 2023
+```
+
+by comparison with our `disk` mount:
+
+```bash
+cat /mnt/disk/file
+
+# This is the current data written onto our xvdf volume
+Thu Mar  9 16:05:02 UTC 2023
+Thu Mar  9 16:18:37 UTC 2023
+```
+
+### Cleanup
+
+Now we can cleanup the volume we created, we don't need them anymore.
+
+Unmount the disks:
+
+```bash
+sudo umount /mnt/disk
+sudo umount /mnt/disk2
+```
+
+Detach the volumes in the EC2 console. To do it, browse to `Elastic Block Store` -> `Volumes`, then click on the volume you want to detach and detach it. we can see if some volumes are still attach on the `Storage` tab of our instance dashboard. Our 2 volumes are successfully detached:
+
+![](img/1volumes.png)
+
+Finally, we can delete the volume and the snapshot we just have detached. To do it, select it from the volumes list and click on the `Delete` button on the top.
+
+### Questions
+
+**Copy the Availability Zone of your Instance and Volume into the report.**
+
+* Availability Zone of our instance: `us-east-1b`
+
+* Availability Zone of our volume: `us-east-1b`
+
+**Copy the available space after formatting and mounting into the report.**
+
+```bash
+#  available space after formatting and mounting
+df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1      7.6G  2.5G  5.2G  33% /
+```
+
 
 
 
