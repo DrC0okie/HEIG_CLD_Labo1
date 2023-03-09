@@ -520,9 +520,9 @@ Thu Mar  9 16:05:02 UTC 2023
 Thu Mar  9 16:18:37 UTC 2023
 ```
 
-### Cleanup
+### Clean-up
 
-Now we can cleanup the volume we created, we don't need them anymore.
+Now we can clean-up the volume we created, we don't need them anymore.
 
 Unmount the disks:
 
@@ -549,9 +549,9 @@ Finally, we can delete the volume and the snapshot we just have detached. To do 
 
 ```bash
 #  available space after formatting and mounting
-df -h /
+df -h /mnt/disk
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/xvda1      7.6G  2.5G  5.2G  33% /
+/dev/xvdf       974M   24K  907M   1% /mnt/disk
 ```
 
 
