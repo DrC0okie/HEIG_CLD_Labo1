@@ -346,6 +346,8 @@ On our Drupal website, create a new web page by clicking on `Add content`, then 
 
 ### Allocate an elastic IP address
 
+A dynamic IP address is assigned to our instance, so the address will change over time, so we need to allocate a dynamic IP address four our website.
+
 > An *Elastic IP address* is a static IPv4 address designed for dynamic cloud computing. An Elastic IP address is allocated to your AWS account, and is yours until you release it. By using an Elastic IP address, you can mask the failure of an instance or software by rapidly remapping the address to another instance in your account. Alternatively, you can specify the Elastic IP address in a DNS record for your domain, so that your domain points to your instance.
 >
 > #### Elastic IP address basics
@@ -370,9 +372,17 @@ To set up an elastic IP, proceed as follow:
 
 ### Questions
 
-**Why is it a good idea to create an Elastic IP Address for a web site (our web application)? Why is it not sufficient to hand out as URL for the web site the public DNS name of the instance?**
+**Why is it a good idea to create an Elastic IP Address for a web site (our web application)?**
 
+By default, AWS assigns a dynamic IP address, so the address will change over time. An Elastic IP address (EIP) provides a static IP address that will not change.
 
+Another advantage of using an EIP is that it can help avoid getting blacklisted. If the IP address assigned to the web server is used by another user for malicious activities, the address may get blacklisted. This can cause emails to be rejected or flagged as spam. With an EIP, we can avoid this issue by quickly associating a new IP address with our web server.
+
+**Why is it not sufficient to hand out as URL for the web site the public DNS name of the instance?**
+
+The public DNS name of an instance is associated with its IP address, which can change whenever the instance is stopped and restarted. This means that if the IP address changes, the DNS name associated with it will also change, and users will no longer be able to access the web site.
+
+Furthermore, when using the public DNS name, we have no control over the DNS record. This means that we cannot configure SSL certificates, subdomains or other DNS features, which may be necessary for our web site.
 
 ## Part 4 : Create volumes and use snapshots
 
