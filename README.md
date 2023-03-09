@@ -2,11 +2,15 @@
 
 **Group U : A. David, T.Van Hove**
 
+------
+
 
 
 ## Table of contents
 
 [TOC]
+
+------
 
 
 
@@ -15,6 +19,10 @@
 This document describes the successive steps necessary to successfully complete laboratory #1 of the CLD course. It will also allow our group to answer the various questions asked in the lab instructions.
 
 The objectives of this lab is to gain experience with an Infrastructure-as-a-Service. We are going to use  AWS to create a service from scratch and measure its performance and resource consumption. Finally we will estimate the price tag of such a service using AWS.
+
+------
+
+
 
 ## Part 1 & 2 : Setting up a virtual server
 
@@ -220,7 +228,151 @@ If we type the `ifconfig` command, we can see that the OS sees an `eth0` interfa
 
 But why our instance does not see the same ip address as the public one we used to ping it? Well, each machine inside the datacentre has a private address, not accessible from the outside. It is the datacentre routers job to route every ingoing or outgoing packets. That's why we have 2 different addresses : one for the local network and a public one that can be accessed from outside the local network.
 
-## Part 3 : Install a web application
+------
+
+
+
+## Part 3 : Install a web application (Drupal)
+
+In this part, we are going to host Drupal on our EC2 instance.
+
+> What is Drupal?
+>
+> Drupal is a content management software. It's used to make many of the websites and applications used every day. Drupal has standard  features, like easy content authoring, reliable performance, and  excellent security. But what sets it apart is its flexibility;  modularity is one of its core principles. Its tools help you build the  versatile, structured content that dynamic web experiences need. [Source](https://www.drupal.org/about)
+
+### Change the configuration of the security group
+
+Because we are going to serve a web application we need to add `incoming traffic rule for HTTP port 80`. To add a rule follow the same steps [we did previously](#Setting-up-the-security-groups).
+
+Now when we enter the public DNS name of our instance we can see the Apache2 default page.
+
+![Default page](img/apache2.png)
+
+### Install mandatory packages
+
+First, we need to install [tasksel](https://help.ubuntu.com/community/Tasksel) to our instance. It is a Debian/Ubuntu tool that installs multiple related packages as a coordinated "task" onto the system. For example, instead of going step-by-step and installing each LAMP stack component, you can have tasksel install all the parts of the LAMP stack.
+
+Install tasksel:
+
+```bash
+sudo apt install tasksel
+```
+
+Install the lamp stack:
+
+```bash
+sudo tasksel install lamp-server
+```
+
+Install PHP packages
+
+```bash
+sudo apt install php7.2-dom php7.2-gd php7.2-xml php7.2-SimpleXML
+sudo systemctl restart apache2
+```
+
+### Setup the database for Drupal
+
+```bash
+sudo mysql_secure_installation
+```
+
+Respond as follows:
+
+- Setup VALIDATE PASSWORD plugin: **No**
+- Password for root: Invent a password and write it down
+- Remove anonymous users: **No**
+- Disallow root login remotely: **No**
+- Remove test database and access to it: **No**
+- Reload privilege tables now: **Yes**
+
+Create the Durpal database in MySQL:
+
+```bash
+sudo mysql -u root -p
+```
+
+Create a user and a database for Drupal. You can choose any password for this user.
+```bash
+mysql> CREATE USER 'drupal'@'localhost' IDENTIFIED BY 'CLD_Lab01';
+mysql> CREATE DATABASE drupal;
+mysql> GRANT ALL PRIVILEGES ON drupal.* TO 'drupal'@'localhost' IDENTIFIED BY 'CLD_Lab01';
+mysql> EXIT;
+```
+
+### Download and install Drupal
+
+```bash
+# Go to /tmp and download drupal from their ftp repository
+cd /tmp
+wget https://ftp.drupal.org/files/projects/drupal-8.8.2.tar.gz
+
+# Go to /var/www/html and extract what we downloaded
+cd /var/www/html
+sudo tar xzf /tmp/drupal-8.8.2.tar.gz
+
+# Create a symlink with a shorter name
+sudo ln -s drupal-8.8.2 drupal
+
+# Change the ownership of all drupal files to Apache which has the user www-data and group www-data
+sudo chown -R www-data:www-data drupal/
+```
+
+The set up is done directly in the browser. Now, navigate to the hostname of the EC2 instance with the appended path `/drupal/core/install.php`.
+
+Fill in the installation screens as follows:
+
+- Choose language: **English**
+- Select an installation profile: **Standard**
+- Requirements review: ignore the warnings about clean URLs and Unicode library and continue
+- Database configuration:
+  - Database name: **drupal**
+  - Database username: **drupal**
+  - Database password: the password for the drupal MySQL user you created earlier
+- Configure site:
+  - Site name: Invent something, say "Cloud Computing at HEIG-VD"
+  - Site email address: nobody@example.com
+  - Maintenance account username: admin
+  - Password: invent a password for the admin user and write it down
+  - Default country: Switzerland
+  - Default time zone: Zurich
+  - Check for updates: uncheck
+
+### Create a new main page
+
+On our Drupal website, create a new web page by clicking on `Add content`, then select `Basic page`.  Chose a page title and write something about the page in the body. Check`Published` under `Text format`. On the right menu click on `Promotion Options` then select `Promoted to front page`. This will make this page the default one when browsing the website. Finally click on `Save`. You must have a similar result:
+
+![drupal_custom_page](img/Drupal_Screenshot.png)
+
+### Allocate an elastic IP address
+
+> An *Elastic IP address* is a static IPv4 address designed for dynamic cloud computing. An Elastic IP address is allocated to your AWS account, and is yours until you release it. By using an Elastic IP address, you can mask the failure of an instance or software by rapidly remapping the address to another instance in your account. Alternatively, you can specify the Elastic IP address in a DNS record for your domain, so that your domain points to your instance.
+>
+> #### Elastic IP address basics
+>
+> The following are the basic characteristics of an Elastic IP address:
+>
+> - An Elastic IP address is static; it does not change over time.
+> - An Elastic IP address is for use in a specific Region only, and cannot be moved to a different Region.
+> - An Elastic IP address comes from Amazon's pool of IPv4 addresses, or from a custom IPv4 address pool that you have brought to your AWS account.
+> - To use an Elastic IP address, you first allocate one to your account, and then associate it with your instance or a network interface.
+> - When you associate an Elastic IP address with an instance, it is also associated with the instance's primary network interface. When you associate an Elastic IP address with a network interface that is attached to an instance, it is also associated with the instance.
+>
+> [Source](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html)
+
+To set up an elastic IP, proceed as follow:
+
+1. In the AWS console, on the left panel, under `Network and security` click on `Elastic IPs`.
+2. click on the `Allocate New Address` button.
+3. On the page, you can create a tag with the key `Name` and as value the name you wan to use (in our case GrU_VanHove).
+4. Select the newly created address and click on `Actions` -> `Associate`. Select the your EC2 instance.
+5. Try to ping or access the public allocated address. In our case, the public IP is: `34.226.79.126`. So we can access our website from : `http://34.226.79.126/drupal/`.
+
+### Questions
+
+**Why is it a good idea to create an Elastic IP Address for a web site (our web application)? Why is it not sufficient to hand out as URL for the web site the public DNS name of the instance?**
+
+
 
 ## Part 4 : Create volumes and use snapshots
 
@@ -229,5 +381,4 @@ But why our instance does not see the same ip address as the public one we used 
 ## Part 6 : Resource consumption and pricing
 
 ## Conclusion
-
 
