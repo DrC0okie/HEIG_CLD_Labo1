@@ -586,11 +586,114 @@ Filesystem      Size  Used Avail Use% Mounted on
 /dev/xvdf       974M   24K  907M   1% /mnt/disk
 ```
 
-
+------
 
 
 
 ## Part 5 : Performance analysis
+
+In this part we are going to run a benchmarking application on our EC2 instance and your local machine to test performance and memory throughput. Wi will then compare the results.
+
+### Install geekbench
+
+Download the Linux version of the Geekbench benchmark:
+
+```bash
+curl -O http://cdn.primatelabs.com/Geekbench-3.3.0-Linux.tar.gz
+```
+
+Extract the files from the archive:
+
+```bash
+tar -xvzf Geekbench-3.3.0-Linux.tar.gz
+```
+
+Install 32-bit compatibility libraries needed by Geekbench:
+
+```bash
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install libc6:i386 libstdc++6:i386
+```
+
+In our local machine (Windows 11) we will install geekbench from the [website](https://www.geekbench.com/download/windows/).
+
+### Run the benchmark
+
+To run the benchmark:
+
+```bash
+cd dist/Geekbench-3.3.0-Linux
+./geekbench
+```
+
+**EC2 instance**
+
+System information gathered by geekbench:
+
+```
+System Information
+  Operating System      Ubuntu 18.04.6 LTS 5.4.0-1097-aws x86_64
+  Model                 Xen HVM domU
+  Motherboard           N/A
+  Processor             Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz @ 2.40 GHz  1 Processor
+  Processor ID          GenuineIntel Family 6 Model 63 Stepping 2
+  L1 Instruction Cache  32.0 KB
+  L1 Data Cache         32.0 KB
+  L2 Cache              256 KB
+  L3 Cache              30.0 MB
+  Memory                974 MB
+  BIOS                  Xen 4.11.amazon
+```
+
+Overall results:
+
+![](img/geekbench_instance.png)
+
+The details can be viewed [here](http://browser.primatelabs.com/geekbench3/9036579).
+
+**Local machine**
+
+| System information   |                                             |
+| -------------------- | ------------------------------------------- |
+| Operating System     | Microsoft Windows 11 Home (64-bit)          |
+| Model                | Dell Inc. Inspiron 5491 2n1                 |
+| Motherboard          | Dell Inc. 0YXCW8                            |
+| Processor            | Intel Core i7-10510U @ 2.30GHz              |
+| Processor ID         | GenuineIntel Family 6 Model 142 Stepping 12 |
+| L1 Instruction Cache | 32.0 KB                                     |
+| L1 Data Cache        | 32.0 KB                                     |
+| L2 Cache             | 256 KB                                      |
+| L3 Cache             | 8.00 MB                                     |
+| Memory               | 16.00 GB                                    |
+
+Overall results:
+
+![](img/geekbench_local.png)
+
+The details can be viewed [here](https://browser.geekbench.com/v6/cpu/480043).
+
+### Performance comparison
+
+As we can see in the graph below, the EC2 instance is not very powerful in terms of single core performance compared to our local machine. 
+
+But how can a single thread of a laptop with [25W TDP](https://www.intel.com/content/www/us/en/products/sku/196449/intel-core-i710510u-processor-8m-cache-up-to-4-90-ghz/specifications.html)* can beat a server-grade CPU thread of [120W TDP](https://ark.intel.com/content/www/us/en/ark/products/81709/intel-xeon-processor-e52670-v3-30m-cache-2-30-ghz.html)*?
+
+Well, the performance gap between a CPU manufactured in 2014 and 2019 is probably the main reason. The semiconductor technology used to manufacture an integrated circuit (lithography) has improved a lot in 5 years, passing from 22nm (EC2) to 14nm (Local machine). That means that the transistors used in the latest CPU are almost half the size of the one used in the EC2 instance CPU. This means that for the same die area, the manufacturer can put almost 2x more transistors, increasing the CPU performance and diminishing the consumption.
+
+> TDP: Thermal Design Power represents the average power, in watts, the  processor dissipates when operating at Base Frequency with all cores  active
+
+![](img/Single_core_graph.svg)
+
+
+
+Concerning the multicore performance, nothing special here, because the EC2 instance only have 1 CPU thread, so it will not be more powerful than the single core performance benchmark. In the other hand our local machine has 8 threads.
+
+![](img/Multi_core_graph.svg)
+
+------
+
+
 
 ## Part 6 : Resource consumption and pricing
 
