@@ -1,8 +1,6 @@
 # HEIG_CLD_Labo1
 
-**Group U : A. David, T.Van Hove**
-
-------
+**Group U : A. David, T. Van Hove**
 
 
 
@@ -10,17 +8,17 @@
 
 [TOC]
 
-------
+
+
+
 
 
 
 ## Introduction
 
-This document describes the successive steps necessary to successfully complete laboratory #1 of the CLD course. It will also allow our group to answer the various questions asked in the lab instructions.
+This document describes the successive steps necessary to successfully complete laboratory #1 of the CLD course. It will also allow our group to answer the various questions asked in the lab instructions. We decided to include the precise procedure for every step. This would be useful in case we have to do it again later. 
 
 The objectives of this lab is to gain experience with an Infrastructure-as-a-Service. We are going to use  AWS to create a service from scratch and measure its performance and resource consumption. Finally we will estimate the price tag of such a service using AWS.
-
-------
 
 
 
@@ -196,7 +194,6 @@ With the `free -h` command we can see that we have 292MB of free memory.
 |        | total | used  | free  | shared | buff/cache | available |
 | ------ | ----- | ----- | ----- | ------ | ---------- | --------- |
 | Memory | 974MB | 129MB | 292MB | 792kB  | 551MB      | 677MB     |
-| Swap   | 0B    | 0B    | 0B    |        |            |           |
 
 **7 Trying to ping the instance**
 
@@ -226,9 +223,7 @@ Now it is possible to ping our local machine with the public IPv4 address:
 
 If we type the `ifconfig` command, we can see that the OS sees an `eth0` interface with the following ip address: `172.31.82.15`. This address is in the private network range, used for local communications.
 
-But why our instance does not see the same ip address as the public one we used to ping it? Well, each machine inside the datacentre has a private address, not accessible from the outside. It is the datacentre routers job to route every ingoing or outgoing packets. That's why we have 2 different addresses : one for the local network and a public one that can be accessed from outside the local network.
-
-------
+But why our instance does not see the same ip address as the public one we used to ping it? Well, each machine inside the datacenter has a private address, not accessible from the outside. It is the datacentre routers job to route every ingoing or outgoing packets. That's why we have 2 different addresses : one for the local network - associated with our instance and a public one that can be accessed from outside the local network provided by the router.
 
 
 
@@ -409,8 +404,6 @@ The public DNS name of an instance is associated with its IP address, which can 
 
 Furthermore, when using the public DNS name, we have no control over the DNS record. This means that we cannot configure SSL certificates, subdomains or other DNS features, which may be necessary for our web site.
 
-------
-
 
 
 ## Part 4 : Create volumes and use snapshots
@@ -580,13 +573,11 @@ Finally, we can delete the volume and the snapshot we just have detached. To do 
 **Copy the available space after formatting and mounting into the report.**
 
 ```bash
-#  available space after formatting and mounting
+#  available space of our 1GB volume after formatting and mounting
 df -h /mnt/disk
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/xvdf       974M   24K  907M   1% /mnt/disk
 ```
-
-------
 
 
 
@@ -594,7 +585,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 
 In this part we are going to run a benchmarking application on our EC2 instance and your local machine to test performance and memory throughput. Wi will then compare the results.
 
-### Install geekbench
+### Install geekbench 3
 
 Download the Linux version of the Geekbench benchmark:
 
@@ -616,7 +607,7 @@ sudo apt update
 sudo apt install libc6:i386 libstdc++6:i386
 ```
 
-In our local machine (Windows 11) we will install geekbench from the [website](https://www.geekbench.com/download/windows/).
+In our local machine (Windows 11) we will install geekbench from the [website](https://cdn.geekbench.com/Geekbench-3.4.4-WindowsSetup.exe).
 
 ### Run the benchmark
 
@@ -687,15 +678,60 @@ Well, the performance gap between a CPU manufactured in 2014 and 2019 is probabl
 
 
 
-Concerning the multicore performance, nothing special here, because the EC2 instance only have 1 CPU thread, so it will not be more powerful than the single core performance benchmark. In the other hand our local machine has 8 threads.
+Concerning the multicore performance graph below, nothing special to be seen, because the EC2 instance only have 1 CPU thread, so it will not be more powerful than the single core performance benchmark. In the other hand our local machine has 8 threads.
 
 ![](img/Multi_core_graph.svg)
-
-------
 
 
 
 ## Part 6 : Resource consumption and pricing
 
+### Estimate cost for 5 hours
+
+In this part you will determine how much Amazon charges customers for using cloud resources.
+
+On this documentation, we can see the hourly rate of our t2.micro instance:
+
+| Instance name | Hourly rate | vCPU | Memory | Storage  | Network performance |
+| ------------- | ----------- | ---- | ------ | -------- | ------------------- |
+| t2.micro      | $0.0116     | 1    | 1 GiB  | EBS Only | Low to Moderate     |
+
+If we consider that the instance has been running for approximately 5 hours, we can estimate that the price would be $0.058. *This does not include the storage cost*.
+
+Now we will see if our estimation is correct by checking the [AWS Simple Monthly Calculator](http://calculator.s3.amazonaws.com/index.html):
+
+![](C:\Users\timot\Documents\HEIG\CLD\Labos\HEIG_CLD_Labo1\img\5hours_cost.png)
+
+We can see that for 5 hours, the EC2 instance + storage will cost approximately $0.86 / month.
+
+### More realistic scenario
+
+Now, the cost we calculated before isn't really realistic. Nobody will run an instance for only 5 hours/m. If we consider an EC2 instance hosting a website, running 24/7, including the elastic IP costs,  we would aproximately pay $12.90/m
+
+![](C:\Users\timot\Documents\HEIG\CLD\Labos\HEIG_CLD_Labo1\img\720hours_cost.png)
+
+### Questions
+
+**How much does your instance (including disk) cost per hour? What was its cost for this lab?**
+
+As we [have seen before](#Estimate-cost-for-5-hours), for 5 hour of utilization, it will cost M. Graff approximately $0.86 four our instance. The hourly would be $0.172.
+
+**Change the parameters to an instance that runs continuously during the whole month. Note the total cost.**
+
+As we [have seen before](#More-realistic-scenario), the monthly cost for an instance running 24/7 would be: 12.90/month.
+
+**When you buy a hard drive at [Digitec](https://www.digitec.ch/en/producttype/hard-drives-36) how much do you pay per TB? (Look at the best selling model, which is the first in the list. Prices per TB are shown in gray.) How much does a 1 TB ESB Volume cost for a month?**
+
+[With this HDD](https://www.digitec.ch/en/s1/product/seagate-exos-x18-18-tb-35-cmr-hard-drives-13961890) , we would pay approximately 15.44/TB. By contrast, an EBS volume of 1000GB (GP2) would cost us $100.00 / month:  ![](img/1TB_EBS.png)
+
+
+
 ## Conclusion
 
+The pedagogical objectives of this labo was mainly to gain experience with an Infrastructure-as-a-Service offering. We think that we have fully achieve this objective.
+
+In this Lab, we have seen how to set up a virtual Server with AWS EC2 instance that hosts a website with a static IP. We have seen how to expand our instance storage and how to create snapshots for backup purpose. Finally we have analysed the computing performance of such and the overall pricing of such an instance.
+
+It would have been great to learn how to use AWS Command Line Interface. We would have learn how to create scripts to automatically create and launch instances. But it is probably not in the scope of this lab, and we can learn it by ourselves in our free time.
+
+This document is available online on our [Github repo](https://github.com/DrC0okie/HEIG_CLD_Labo1).
