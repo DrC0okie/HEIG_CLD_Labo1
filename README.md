@@ -248,6 +248,31 @@ Now when we enter the public DNS name of our instance we can see the Apache2 def
 
 ![Default page](img/apache2.png)
 
+### Enable clean URL in Apache
+
+> By default, Drupal uses and generates URLs for your site's pages that look like "http://www.example.com/?q=node/83". With so-called clean URLs this would be displayed without the `?q=`  as "http://www.example.com/node/83".
+>
+> The style of URLs using `?q=` can be hard to read, and may even  prevent some search engines from indexing all the pages of your site. Research suggests this may not be as big of a problem for major search engines as it once was; however, it is worth noting the recommendation from [Google's webmaster guidelines](http://www.google.com/support/webmasters/bin/answer.py?answer=35769) stating:
+>
+> > If you decide to use dynamic pages (i.e. the URL contains a `?`  character), be aware that not every search engine spider crawls dynamic pages as well as static pages. It helps to keep the parameters short and the number of them few.
+>
+> [Source](https://www.drupal.org/docs/7/configuring-clean-urls/enable-clean-urls)
+
+To enable clean URL, we must edit the apache config file located in /etc/apache2/apache2.conf :
+
+```bash
+sudo nano /etc/apache2/apache2.conf
+
+# In this section
+<Directory /var/www/>
+    Options Indexes FollowSymLinks
+    AllowOverride None # change it to  AllowOverride All
+    Require all granted
+</Directory>
+```
+
+Then type `ctl + x` and `y` to save and close the file.
+
 ### Install mandatory packages
 
 First, we need to install [tasksel](https://help.ubuntu.com/community/Tasksel) to our instance. It is a Debian/Ubuntu tool that installs multiple related packages as a coordinated "task" onto the system. For example, instead of going step-by-step and installing each LAMP stack component, you can have tasksel install all the parts of the LAMP stack.
@@ -384,6 +409,10 @@ The public DNS name of an instance is associated with its IP address, which can 
 
 Furthermore, when using the public DNS name, we have no control over the DNS record. This means that we cannot configure SSL certificates, subdomains or other DNS features, which may be necessary for our web site.
 
+------
+
+
+
 ## Part 4 : Create volumes and use snapshots
 
 In this part we are going to assume that our Drupal site has run out of disk space. To mitigate the problem, we are going to create an additional virtual disk and attach it to the virtual machine.
@@ -409,21 +438,22 @@ Filesystem      Size  Used Avail Use% Mounted on
 1. On the EC2 dashboard, navigate to `Elastic Block Store` -> `Volumes`, then click on the `Create volume` button.
 2. Allocate the desired volume size (we selected 1GB).
 
-3. Select the availability zone. It must be the same as your EC2 instance. We chose us-east-1a.
+3. Select the availability zone. It must be the same as your EC2 instance. We chose us-east-1b.
 
 4. Eventually, add a tag `Name` with, for value, the name you want to give it.
 
 5. Click on the `Create volume` button.
-6. Once it's created, Select it in the volume list, and attach it to your instance.
+6. Once it's created, Select the newly created volume in the list, and attach it to your instance.
 
 Once it's done, we can navigate to the `/dev` directory using SSH to display the file that represent the disk:
 
 ```bash
 /dev$ ls -l /dev/xvdf
+
 brw-rw---- 1 root disk 202, 80 Mar  9 15:27 /dev/xvdf
 ```
 
-Now we are going to partition the newly created disk with ext4:
+Now we are going to partition the newly created disk with ext4 filesystem:
 ```bash
 sudo mkfs --type ext4 /dev/xvdf
 ```
@@ -452,7 +482,9 @@ Filesystem      Size  Used Avail Use% Mounted on
 /dev/xvdf       974M   24K  907M   1% /mnt/disk
 ```
 
-We can write some data on it :
+Apparently the file system uses 24K without any data written on it.
+
+We can write some data on it (just a date):
 
 ```bash
 sudo bash -c 'date >> /mnt/disk/file'
@@ -469,7 +501,7 @@ Thu Mar  9 16:05:02 UTC 2023
 
 ### Make a snapshot of our volume
 
-From the EC2 bashboard we navigate to `Elastic Block Store` -> `Volumes` and select the volume we created. Then, from the `Action` drop down button, select `Create snapshot`. We give our snapshot a name and click on the `Create snapshot` button. Now we can see the newly created snapshot on `Elastic Block Store` -> `Snapshots`.  We must wait until it has the `completed` status.
+From the EC2 dashboard we navigate to `Elastic Block Store` -> `Volumes` and select the volume we created. Then, from the `Action` drop down button, select `Create snapshot`. We give our snapshot a name and click on the `Create snapshot` button. Now we can see the newly created snapshot on `Elastic Block Store` -> `Snapshots`.  We must wait until it has the `completed` status.
 
 Now we will write more data to the disk to validate that our snapshot represent an older version of our disk:
 
