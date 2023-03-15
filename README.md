@@ -1,18 +1,14 @@
-# HEIG_CLD_Labo1
+# CLD - Laboratory 01
 
 **Group U : A. David, T. Van Hove**
 
+**Teacher : Prof. Marcel Graf**
 
+**Assistant : Rémi Poulard**
 
 ## Table of contents
 
 [TOC]
-
-
-
-
-
-
 
 ## Introduction
 
